@@ -20,9 +20,14 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 # Obtener conexión o salir en caso de error, mira bd.php
 $bd = obtenerBD();
 
+# Guardamos el documento recibido desde el formulario
+$nombre_doc = $_FILES["documento"]['name'];
+$ruta = "../" . $nombre_doc;
+move_uploaded_file($_FILES["documento"]['tmp_name'], $ruta);
+
 # El archivo a importar
 # Recomiendo poner la ruta absoluta si no está junto al script
-$rutaArchivo = $_FILE['file']['tmp_name'];
+$rutaArchivo = $ruta;
 $documento   = IOFactory::load($rutaArchivo);
 
 # Se espera que en la primera hoja estén los productos
@@ -31,7 +36,7 @@ $hojaDeProductos = $documento->getSheet(0);
 # Preparar base de datos para que los inserts sean rápidos
 $bd->beginTransaction();
 
-# Preparar sentencia de productos
+# Preparar sentencia de categorias
 $sentencia = $bd->prepare("insert into catsearch
     (categoria ) values (?)");
 
@@ -46,16 +51,16 @@ $numeroMayorDeColumna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFr
 for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
 
     # Las columnas están en este orden:
-    # Código de barras, Descripción, Precio de Compra, Precio de Venta, Existencia
+    # Categoria
     $categoria = $hojaDeProductos->getCellByColumnAndRow(1, $indiceFila);
     $sentencia->execute([$categoria]);
 }
 
-# Ahora vamos con los clientes
+# Ahora vamos con los fabricantes
 $sentencia = $bd->prepare("insert into fabricantesearch
     (categoria_id, fabricante) values (?, ?)");
 
-# Se espera que en la segunda hoja estén los clientes
+# Se espera que en la segunda hoja estén los fabricantes
 $hojaDeClientes = $documento->getSheet(1);
 
 # Calcular el máximo valor de la fila como entero, es decir, el
@@ -69,17 +74,17 @@ $numeroMayorDeColumna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFr
 for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
 
     # Las columnas están en este orden:
-    # Nombre, Correo electrónico
+    # Categoria_id, Fabricante
     $categoria_id = $hojaDeClientes->getCellByColumnAndRow(1, $indiceFila);
     $fabricante   = $hojaDeClientes->getCellByColumnAndRow(2, $indiceFila);
     $sentencia->execute([$categoria_id, $fabricante]);
 }
 
-# Ahora vamos con los clientes
+# Ahora vamos con los productos
 $sentencia = $bd->prepare("insert into productosearch
     (categoria_id, fabricante_id, producto, aprobacion, enlace) values (?, ?, ?, ?, ?)");
 
-# Se espera que en la segunda hoja estén los clientes
+# Se espera que en la tercera hoja estén los productos
 $hojaDeClientes = $documento->getSheet(2);
 
 # Calcular el máximo valor de la fila como entero, es decir, el
@@ -93,7 +98,7 @@ $numeroMayorDeColumna = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFr
 for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
 
     # Las columnas están en este orden:
-    # Nombre, Correo electrónico
+    # Categoria_id, Fabricante_id, Producto, Aprobación, Enlace.
     $categoria_id  = $hojaDeClientes->getCellByColumnAndRow(1, $indiceFila);
     $fabricante_id = $hojaDeClientes->getCellByColumnAndRow(2, $indiceFila);
     $producto      = $hojaDeClientes->getCellByColumnAndRow(3, $indiceFila);
@@ -104,3 +109,6 @@ for ($indiceFila = 2; $indiceFila <= $numeroMayorDeFila; $indiceFila++) {
 
 # Hacer commit para guardar cambios de la base de datos
 $bd->commit();
+
+# Se devuelve al index con un mensaje de confirmación
+header("Location:../index.php?mensaje=Confirmado");

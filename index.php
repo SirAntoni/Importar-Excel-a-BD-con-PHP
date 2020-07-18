@@ -10,17 +10,26 @@
 
 	<div class="container">
 		<h4 class="text-center mb-4">Importar Tablas Excel a Base de datos con PHP</h4>
-		<form action="controller/controllerImportarExcel.php" method="POST">
+		<form action="controller/controllerImportarExcel.php" method="POST" enctype="multipart/form-data">
 			<div class="row justify-content-center">
 				<div class="col-md-7">
 					<div class="form-group">
 						<label for="cargar documento">Cargar documento excel:</label>
 						<div class="custom-file">
-							<input type="file" class="custom-file-input" name="file" id="customFile">
+							<input type="file" class="custom-file-input" name="documento" id="customFile">
 							<label class="custom-file-label" for="customFile">Seleccionar archivo</label>
 						</div>
 					</div>
 					<button type="submit" class="btn btn-primary">Guardar</button>
+					<?php 
+					if (isset($_GET['mensaje']) && $_GET['mensaje'] == "Confirmado") {
+						?>
+							<div class="alert alert-success mt-2">
+								Excel subido.
+							</div>
+						<?php
+					}
+					?>
 				</div>
 			</div>
 		</form>
