@@ -10,13 +10,13 @@
 
 	<div class="container">
 		<h4 class="text-center mb-4">Importar Tablas Excel a Base de datos con PHP</h4>
-		<form action="" method="POST">
+		<form action="controller/controllerImportarExcel.php" method="POST">
 			<div class="row justify-content-center">
 				<div class="col-md-7">
 					<div class="form-group">
 						<label for="cargar documento">Cargar documento excel:</label>
 						<div class="custom-file">
-							<input type="file" class="custom-file-input" id="customFile">
+							<input type="file" class="custom-file-input" name="file" id="customFile">
 							<label class="custom-file-label" for="customFile">Seleccionar archivo</label>
 						</div>
 					</div>

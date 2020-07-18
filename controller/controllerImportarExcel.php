@@ -22,7 +22,7 @@ $bd = obtenerBD();
 
 # El archivo a importar
 # Recomiendo poner la ruta absoluta si no está junto al script
-$rutaArchivo = $_FILE['tmp_name'];
+$rutaArchivo = $_FILE['file']['tmp_name'];
 $documento   = IOFactory::load($rutaArchivo);
 
 # Se espera que en la primera hoja estén los productos
